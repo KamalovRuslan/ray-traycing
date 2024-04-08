@@ -22,6 +22,14 @@ impl Ray {
     }
 }
 
+impl Ray {
+    pub fn color(&self) -> Vec3 {
+        let unit_direction = self.direction().make_unit_vector();
+        let t = 0.5 * (unit_direction.y() + 1.);
+        Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -37,9 +45,16 @@ mod test {
         let a = r.direction();
         assert_eq!(*a, Vec3::new(1., 1., 1.));
     }
+    #[test]
     fn test_point_at(){
         let r = Ray::new(Vec3::new(0., 0., 0.), Vec3::new(1.,  1., 1.));
         let p = r.point_at(2.);
         assert_eq!(p, Vec3::new(2.,  2., 2.));
+    }
+    #[test]
+    fn test_color(){
+        let r = Ray::new(Vec3::new(0., 0., 0.), Vec3::new(1.,  1., 1.));
+        let c = r.color();
+        assert_eq!(c, Vec3::new(0.6056624327025936, 0.7633974596215561, 1.0));
     }
 }
