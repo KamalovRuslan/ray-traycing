@@ -9,7 +9,7 @@ fn main() {
     let nx = 200;
     let ny = 100;
     let lower_lewt_corner = Vec3::new(-2., -1., -1.);
-    let horizontal = Vec3::new(-4., -0., -0.);
+    let horizontal = Vec3::new(4., -0., -0.);
     let vertical = Vec3::new(0., 2., 0.);
     let origin = Vec3::new(0., 0., 0.);
     let mut image_buffer = RgbImage::new(nx as u32, ny as u32);

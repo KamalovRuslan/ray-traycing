@@ -24,9 +24,20 @@ impl Ray {
 
 impl Ray {
     pub fn color(&self) -> Vec3 {
-        let unit_direction = self.direction().make_unit_vector();
-        let t = 0.5 * (unit_direction.y() + 1.);
-        Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
+        if self.hit_sphere(&Vec3::new(0., 0., -1.), 0.5){
+            Vec3::new(1., 0., 0.)
+        } else{
+            let unit_direction = self.direction().make_unit_vector();
+            let t = 0.5 * (unit_direction.y() + 1.);
+            Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
+        }
+    }
+    pub fn hit_sphere(&self, center: &Vec3, r: f64) -> bool {
+        let oc = *self.origin() - *center;
+        let a = self.direction().dot(*self.direction());
+        let b = 2. * self.direction().dot(oc);
+        let c = oc.dot(oc) - r * r;
+        b * b - 4. * a * c > 0.
     }
 }
 
