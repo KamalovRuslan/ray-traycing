@@ -24,20 +24,32 @@ impl Ray {
 
 impl Ray {
     pub fn color(&self) -> Vec3 {
-        if self.hit_sphere(&Vec3::new(0., 0., -1.), 0.5){
-            Vec3::new(1., 0., 0.)
-        } else{
-            let unit_direction = self.direction().make_unit_vector();
-            let t = 0.5 * (unit_direction.y() + 1.);
-            Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
-        }
+        let t = self.hit_sphere(&Vec3::new(0., 0., -1.), 0.5);
+        let clr = match t {
+            Some(v) => {
+                let N = (self.point_at(v) - Vec3::new(0., 0., -1.)).make_unit_vector();
+                Vec3::new(N.x() + 1., N.y() + 1., N.z() + 1.)
+            },
+            None => {
+                let unit_direction = self.direction().make_unit_vector();
+                let t = 0.5 * (unit_direction.y() + 1.);
+                Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
+
+            }
+        };
+        clr
     }
-    pub fn hit_sphere(&self, center: &Vec3, r: f64) -> bool {
+    pub fn hit_sphere(&self, center: &Vec3, r: f64) -> Option<f64> {
         let oc = *self.origin() - *center;
         let a = self.direction().dot(*self.direction());
         let b = 2. * self.direction().dot(oc);
         let c = oc.dot(oc) - r * r;
-        b * b - 4. * a * c > 0.
+        let discr = b * b - 4. * a * c;
+        if discr < 0. {
+            None
+        } else {
+            Some((-b - discr) / (2. * a)) 
+        }
     }
 }
 
