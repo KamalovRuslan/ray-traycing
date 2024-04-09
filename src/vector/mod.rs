@@ -41,7 +41,7 @@ impl Vec3 {
 }
 
 impl Vec3 {
-    pub fn dot(&self, other: Vec3) -> f64{
+    pub fn dot(&self, other: Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
@@ -182,7 +182,7 @@ mod tests {
         assert_eq!(v.squared_len(), 5.);
     }
     #[test]
-    fn unit_vector_test(){
+    fn unit_vector_test() {
         let mut v = Vec3::new(0., 3., 4.);
         v.unit_vector();
         assert_eq!(v, Vec3::new(0., 0.6, 0.8));
@@ -193,13 +193,13 @@ mod tests {
         assert_eq!(v, Vec3::new(0., 3., 4.));
     }
     #[test]
-    fn operation_test(){
+    fn operation_test() {
         let v = Vec3::new(1., 2., 3.);
         let u = Vec3::new(0., 1., 0.);
         assert_eq!(v * u, Vec3::new(-3., 0., 1.));
     }
     #[test]
-    fn dot_test(){
+    fn dot_test() {
         let v = Vec3::new(1., 2., 3.);
         let u = Vec3::new(-1., 0., 1.);
         assert_eq!(u.dot(v), 2.);
