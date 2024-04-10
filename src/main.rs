@@ -1,17 +1,18 @@
+mod camera;
 mod ray;
 mod vector;
 
-use image::{Rgb, RgbImage};
+use camera::Camera;
 use ray::{HitList, Ray, Sphere};
 use vector::Vec3;
+
+use image::{Rgb, RgbImage};
+use rand::prelude::*;
 
 fn main() {
     let nx = 200;
     let ny = 100;
-    let lower_lewt_corner = Vec3::new(-2., -1., -1.);
-    let horizontal = Vec3::new(4., -0., -0.);
-    let vertical = Vec3::new(0., 2., 0.);
-    let origin = Vec3::new(0., 0., 0.);
+    let ns = 100;
     let world = HitList {
         hlist: vec![
             Sphere {
@@ -24,13 +25,19 @@ fn main() {
             },
         ],
     };
+    let camera = Camera::new();
     let mut image_buffer = RgbImage::new(nx as u32, ny as u32);
+    let mut rng = rand::thread_rng();
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let u = i as f64 / nx as f64;
-            let v = j as f64 / ny as f64;
-            let r = Ray::new(origin, lower_lewt_corner + horizontal * u + vertical * v);
-            let color = r.color(&world);
+            let mut color = Vec3::new(0., 0., 0.);
+            for _ in 0..ns {
+                let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / ny as f64;
+                let r = camera.get_ray(u, v);
+                color += r.color(&world);
+            }
+            color /= ns as f64;
             let ir = (255.99 * color.r()) as u8;
             let ig = (255.99 * color.g()) as u8;
             let ib = (255.99 * color.b()) as u8;
