@@ -38,10 +38,11 @@ fn main() {
                 color += r.color(&world);
             }
             color /= ns as f64;
+            color = Vec3::new(color.x().sqrt(), color.y().sqrt(), color.z().sqrt());
             let ir = (255.99 * color.r()) as u8;
             let ig = (255.99 * color.g()) as u8;
             let ib = (255.99 * color.b()) as u8;
-            image_buffer.put_pixel(i as u32, j as u32, Rgb([ir, ig, ib]));
+            image_buffer.put_pixel(i as u32, (ny - j - 1) as u32, Rgb([ir, ig, ib]));
         }
     }
     if let Err(err) = image_buffer.save("output.png") {

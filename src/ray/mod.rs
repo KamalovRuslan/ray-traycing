@@ -44,11 +44,8 @@ impl Ray {
     pub fn color<T: Hit>(&self, world: &T) -> Vec3 {
         match world.hit(&self, 0.0, f64::MAX) {
             Some(hit) => {
-                Vec3::new(
-                    hit.normal.x() + 1.,
-                    hit.normal.y() + 1.,
-                    hit.normal.z() + 1.,
-                ) * 0.5
+                let target = hit.p + hit.normal + Vec3::random_in_unit_sphere();
+                Ray::new(hit.p, target - hit.p).color(world) * 0.5
             }
             None => {
                 let unit_direction = self.direction().make_unit_vector();

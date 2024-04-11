@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -52,6 +53,17 @@ impl Vec3 {
     }
     pub fn make_unit_vector(&self) -> Self {
         *self / self.squared_len()
+    }
+    pub fn random_in_unit_sphere() -> Vec3 {
+        let mut p = Vec3::new(0., 0., 0.);
+        let mut rng = rand::thread_rng();
+        loop {
+            p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>());
+            p = p * 2. - Vec3::new(1., 1., 1.);
+            if p.len() < 1. {
+                break p;
+            }
+        }
     }
 }
 
@@ -203,5 +215,19 @@ mod tests {
         let v = Vec3::new(1., 2., 3.);
         let u = Vec3::new(-1., 0., 1.);
         assert_eq!(u.dot(v), 2.);
+    }
+    #[test]
+    fn random_in_unit_sphere_test() {
+        let v = Vec3::random_in_unit_sphere();
+        assert!(v.x < 1.);
+        assert!(v.x >= -1.);
+
+        assert!(v.y < 1.);
+        assert!(v.x >= -1.);
+
+        assert!(v.z < 1.);
+        assert!(v.x >= -1.);
+
+        assert!(v.len() < 1.);
     }
 }
