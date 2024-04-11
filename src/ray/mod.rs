@@ -42,7 +42,7 @@ impl Ray {
 
 impl Ray {
     pub fn color<T: Hit>(&self, world: &T) -> Vec3 {
-        match world.hit(&self, 0.0, f64::MAX) {
+        match world.hit(&self, 0.001, f64::MAX) {
             Some(hit) => {
                 let target = hit.p + hit.normal + Vec3::random_in_unit_sphere();
                 Ray::new(hit.p, target - hit.p).color(world) * 0.5
