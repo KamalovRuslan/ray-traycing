@@ -54,16 +54,20 @@ impl Ray {
             }
         }
     }
-    pub fn hit_sphere(&self, center: &Vec3, r: f64) -> Option<f64> {
-        let oc = *self.origin() - *center;
-        let a = self.direction().dot(*self.direction());
-        let b = 2. * self.direction().dot(oc);
-        let c = oc.dot(oc) - r * r;
-        let discr = b * b - 4. * a * c;
-        if discr < 0. {
-            None
+}
+
+impl Sphere {
+    fn check_hit_branch(&self, r: &Ray, tmin: f64, tmax: f64, root: f64) -> Option<HitRecord> {
+        if root < tmax && root > tmin {
+            let p = r.point_at(root);
+            let normal = (p - self.center) / self.r;
+            Some(HitRecord {
+                t: root,
+                p: p,
+                normal: normal,
+            })
         } else {
-            Some((-b - discr) / (2. * a))
+            None
         }
     }
 }
@@ -75,42 +79,20 @@ impl Hit for Sphere {
         let b = 2. * r.direction().dot(oc);
         let c = oc.dot(oc) - self.r * self.r;
         let discr = b * b - 4. * a * c;
-        let result = if discr > 0. {
-            let temp = (-b - (b * b - a * c).sqrt()) / a;
-            let inner_result_left = if temp < tmax && temp > tmin {
-                let p = r.point_at(temp);
-                let normal = (p - self.center) / self.r;
-                Some(HitRecord {
-                    t: temp,
-                    p: p,
-                    normal: normal,
-                })
-            } else {
-                None
-            };
-            let temp = (-b + (b * b - a * c).sqrt()) / a;
-            let inner_result_right = if temp < tmax && temp > tmin {
-                let p = r.point_at(temp);
-                let normal = (p - self.center) / self.r;
-                Some(HitRecord {
-                    t: temp,
-                    p: p,
-                    normal: normal,
-                })
-            } else {
-                None
-            };
-            match inner_result_left {
+
+        if discr > 0. {
+            let left_root = (-b - (b * b - a * c).sqrt()) / a;
+            let left_branch = self.check_hit_branch(r, tmin, tmax, left_root);
+            match left_branch {
                 Some(hr) => Some(hr),
-                None => match inner_result_right {
-                    Some(hr) => Some(hr),
-                    None => None,
-                },
+                None => {
+                    let right_root = (-b + (b * b - a * c).sqrt()) / a;
+                    self.check_hit_branch(r, tmin, tmax, right_root)
+                }
             }
         } else {
             None
-        };
-        result
+        }
     }
 }
 

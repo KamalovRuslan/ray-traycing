@@ -3,7 +3,7 @@ mod ray;
 mod vector;
 
 use camera::Camera;
-use ray::{HitList, Ray, Sphere};
+use ray::{HitList, Sphere};
 use vector::Vec3;
 
 use image::{Rgb, RgbImage};
