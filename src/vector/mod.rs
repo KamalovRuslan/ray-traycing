@@ -33,11 +33,11 @@ impl Vec3 {
 }
 
 impl Vec3 {
-    pub fn len(&self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
-    pub fn squared_len(&self) -> f64 {
-        self.len().sqrt()
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
     }
 }
 
@@ -49,10 +49,10 @@ impl Vec3 {
 
 impl Vec3 {
     pub fn unit_vector(&mut self) {
-        *self /= self.squared_len();
+        *self /= self.length();
     }
     pub fn make_unit_vector(&self) -> Self {
-        *self / self.squared_len()
+        *self / self.length()
     }
     pub fn random_in_unit_sphere() -> Vec3 {
         let mut p = Vec3::new(0., 0., 0.);
@@ -60,7 +60,7 @@ impl Vec3 {
         loop {
             p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>());
             p = p * 2. - Vec3::new(1., 1., 1.);
-            if p.len() < 1. {
+            if p.length_squared() < 1. {
                 break p;
             }
         }
@@ -190,8 +190,8 @@ mod tests {
     #[test]
     fn len_test() {
         let v = Vec3::new(0., 3., 4.);
-        assert_eq!(v.len(), 25.);
-        assert_eq!(v.squared_len(), 5.);
+        assert_eq!(v.length_squared(), 25.);
+        assert_eq!(v.length(), 5.);
     }
     #[test]
     fn unit_vector_test() {
@@ -228,6 +228,6 @@ mod tests {
         assert!(v.z < 1.);
         assert!(v.x >= -1.);
 
-        assert!(v.len() < 1.);
+        assert!(v.length_squared() < 1.);
     }
 }
