@@ -41,14 +41,17 @@ impl Ray {
 }
 
 impl Ray {
-    pub fn color<T: Hit>(&self, world: &T) -> Vec3 {
+    pub fn color<T: Hit>(&self, world: &T, depth: u32) -> Vec3 {
+        if depth >= 50 {
+            return Vec3::new(0., 0., 0.);
+        }
         match world.hit(&self, 0.001, f64::MAX) {
             Some(hit) => {
                 let target = hit.p + hit.normal + Vec3::random_in_unit_sphere();
-                Ray::new(hit.p, target - hit.p).color(world) * 0.5
+                Ray::new(hit.p, target - hit.p).color(world, depth + 1) * 0.5
             }
             None => {
-                let unit_direction = self.direction().make_unit_vector();
+                let unit_direction = self.direction().normalized();
                 let t = 0.5 * (unit_direction.y() + 1.);
                 Vec3::new(1., 1., 1.) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.) * t
             }
@@ -81,12 +84,12 @@ impl Hit for Sphere {
         let discr = b * b - 4. * a * c;
 
         if discr > 0. {
-            let left_root = (-b - (b * b - a * c).sqrt()) / a;
+            let left_root = (-b - discr.sqrt()) / (2. * a);
             let left_branch = self.check_hit_branch(r, tmin, tmax, left_root);
             match left_branch {
                 Some(hr) => Some(hr),
                 None => {
-                    let right_root = (-b + (b * b - a * c).sqrt()) / a;
+                    let right_root = (-b + discr.sqrt()) / (2. * a);
                     self.check_hit_branch(r, tmin, tmax, right_root)
                 }
             }

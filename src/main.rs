@@ -35,7 +35,7 @@ fn main() {
                 let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
                 let v = (j as f64 + rng.gen::<f64>()) / ny as f64;
                 let r = camera.get_ray(u, v);
-                color += r.color(&world);
+                color += r.color(&world, 0);
             }
             color /= ns as f64;
             color = Vec3::new(color.x().sqrt(), color.y().sqrt(), color.z().sqrt());

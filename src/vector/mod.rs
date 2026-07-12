@@ -1,5 +1,5 @@
 use rand::prelude::*;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
@@ -45,21 +45,24 @@ impl Vec3 {
     pub fn dot(&self, other: Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+    pub fn cross(&self, other: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.y * other.z - self.z * other.y,
+            y: -self.x * other.z + self.z * other.x,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
 }
 
 impl Vec3 {
-    pub fn unit_vector(&mut self) {
-        *self /= self.length();
-    }
-    pub fn make_unit_vector(&self) -> Self {
+    pub fn normalized(&self) -> Self {
         *self / self.length()
     }
     pub fn random_in_unit_sphere() -> Vec3 {
-        let mut p = Vec3::new(0., 0., 0.);
         let mut rng = rand::thread_rng();
         loop {
-            p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>());
-            p = p * 2. - Vec3::new(1., 1., 1.);
+            let p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>());
+            let p = p * 2. - Vec3::new(1., 1., 1.);
             if p.length_squared() < 1. {
                 break p;
             }
@@ -108,9 +111,9 @@ impl Mul for Vec3 {
 
     fn mul(self, other: Vec3) -> Self {
         Vec3 {
-            x: self.y * other.z - self.z * other.y,
-            y: -self.x * other.z + self.z * other.x,
-            z: self.x * other.y - self.y * other.x,
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
         }
     }
 }
@@ -124,6 +127,26 @@ impl Div<f64> for Vec3 {
             y: self.y / scalar,
             z: self.z / scalar,
         }
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, v: Vec3) -> Vec3 {
+        v * self
     }
 }
 
@@ -153,9 +176,9 @@ impl MulAssign<f64> for Vec3 {
 
 impl MulAssign for Vec3 {
     fn mul_assign(&mut self, other: Vec3) {
-        self.x = self.y * other.z - self.z * other.y;
-        self.y = -self.x * other.z + self.z * other.x;
-        self.z = self.x * other.y - self.y * other.x;
+        self.x *= other.x;
+        self.y *= other.y;
+        self.z *= other.z;
     }
 }
 
@@ -194,21 +217,29 @@ mod tests {
         assert_eq!(v.length(), 5.);
     }
     #[test]
-    fn unit_vector_test() {
-        let mut v = Vec3::new(0., 3., 4.);
-        v.unit_vector();
-        assert_eq!(v, Vec3::new(0., 0.6, 0.8));
-
+    fn normalized_test() {
         let v = Vec3::new(0., 3., 4.);
-        let u = v.make_unit_vector();
+        let u = v.normalized();
         assert_eq!(u, Vec3::new(0., 0.6, 0.8));
         assert_eq!(v, Vec3::new(0., 3., 4.));
     }
     #[test]
+    fn neg_test() {
+        let v = Vec3::new(1., -2., 3.);
+        assert_eq!(-v, Vec3::new(-1., 2., -3.));
+    }
+    #[test]
+    fn scalar_left_mul_test() {
+        let v = Vec3::new(1., 2., 3.);
+        assert_eq!(2.0 * v, Vec3::new(2., 4., 6.));
+        assert_eq!(2.0 * v, v * 2.0);
+    }
+    #[test]
     fn operation_test() {
         let v = Vec3::new(1., 2., 3.);
-        let u = Vec3::new(0., 1., 0.);
-        assert_eq!(v * u, Vec3::new(-3., 0., 1.));
+        let u = Vec3::new(2., 3., 4.);
+        assert_eq!(v * u, Vec3::new(2., 6., 12.));
+        assert_eq!(v.cross(u), Vec3::new(-1., 2., -1.));
     }
     #[test]
     fn dot_test() {
