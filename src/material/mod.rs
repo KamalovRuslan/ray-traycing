@@ -1,4 +1,4 @@
-use crate::ray::{Ray, HitRecord};
+use crate::ray::{HitRecord, Ray};
 use crate::vector::Vec3;
 
 fn reflect(v: Vec3, n: Vec3) -> Vec3 {

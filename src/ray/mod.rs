@@ -49,9 +49,7 @@ pub fn color<T: Hit>(r: &Ray, world: &T, depth: u32) -> Vec3 {
     }
     match world.hit(r, 0.001, f64::MAX) {
         Some(hit) => match hit.material.scatter(r, &hit) {
-            Some((scattered, attenuation)) => {
-                attenuation * color(&scattered, world, depth + 1)
-            }
+            Some((scattered, attenuation)) => attenuation * color(&scattered, world, depth + 1),
             None => Vec3::new(0., 0., 0.),
         },
         None => {
