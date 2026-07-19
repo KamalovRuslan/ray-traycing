@@ -8,20 +8,28 @@ Built as a learning project to explore Rust concepts through graphics programmin
 
 ![render](output.png)
 
+## Features
+
+- Materials: Lambertian (diffuse), Metal (with fuzz), Dielectric (glass)
+- Positionable camera with configurable field of view
+- Depth of field (aperture simulation)
+- Anti-aliasing (multi-sample per pixel)
+- Parallel rendering with rayon
+
 ## Build & Run
 
 ```bash
-cargo run        # renders to output.png
-cargo test       # run unit tests
+cargo run --release    # renders to output.png (use --release, debug is ~10x slower)
+cargo test             # run unit tests
 ```
 
 ## Project Structure
 
 ```
 src/
-  main.rs          — scene setup and render loop
+  main.rs          — scene generation and parallel render loop
   vector/mod.rs    — Vec3 with arithmetic ops
   ray/mod.rs       — Ray, Sphere, Hit trait, HitList
-  camera/mod.rs    — Camera (viewport, ray generation)
-  material/mod.rs  — Material trait, Lambertian, Metal
+  camera/mod.rs    — Camera (position, fov, depth of field)
+  material/mod.rs  — Material trait, Lambertian, Metal, Dielectric
 ```
