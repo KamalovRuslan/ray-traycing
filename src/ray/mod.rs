@@ -14,14 +14,14 @@ pub struct HitRecord<'a> {
     pub material: &'a dyn Material,
 }
 
-pub struct Sphere<'a> {
+pub struct Sphere {
     pub center: Vec3,
     pub r: f64,
-    pub material: &'a dyn Material,
+    pub material: Box<dyn Material>,
 }
 
-pub struct HitList<T: Hit> {
-    pub hlist: Vec<T>,
+pub struct HitList {
+    pub hlist: Vec<Sphere>,
 }
 
 pub trait Hit {
@@ -43,7 +43,7 @@ impl Ray {
     }
 }
 
-pub fn color<T: Hit>(r: &Ray, world: &T, depth: u32) -> Vec3 {
+pub fn color(r: &Ray, world: &HitList, depth: u32) -> Vec3 {
     if depth >= 50 {
         return Vec3::new(0., 0., 0.);
     }
@@ -60,7 +60,7 @@ pub fn color<T: Hit>(r: &Ray, world: &T, depth: u32) -> Vec3 {
     }
 }
 
-impl<'a> Sphere<'a> {
+impl Sphere {
     fn check_hit_branch(&self, r: &Ray, tmin: f64, tmax: f64, root: f64) -> Option<HitRecord<'_>> {
         if root < tmax && root > tmin {
             let p = r.point_at(root);
@@ -69,7 +69,7 @@ impl<'a> Sphere<'a> {
                 t: root,
                 p: p,
                 normal: normal,
-                material: self.material,
+                material: &*self.material,
             })
         } else {
             None
@@ -77,7 +77,7 @@ impl<'a> Sphere<'a> {
     }
 }
 
-impl<'a> Hit for Sphere<'a> {
+impl Hit for Sphere {
     fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<HitRecord<'_>> {
         let oc = *r.origin() - self.center;
         let a = r.direction().dot(*r.direction());
@@ -101,7 +101,7 @@ impl<'a> Hit for Sphere<'a> {
     }
 }
 
-impl<T: Hit> Hit for HitList<T> {
+impl Hit for HitList {
     fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<HitRecord<'_>> {
         let mut temp_rec: Option<HitRecord<'_>> = None;
         let mut closest_so_far = tmax;

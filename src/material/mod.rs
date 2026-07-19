@@ -22,7 +22,7 @@ fn schlick(cosine: f64, ref_idx: f64) -> f64 {
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(&self, r: &Ray, hr: &HitRecord) -> Option<(Ray, Vec3)>;
 }
 
