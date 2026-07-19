@@ -4,7 +4,7 @@ mod ray;
 mod vector;
 
 use camera::Camera;
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use ray::{color, HitList, Sphere};
 use vector::Vec3;
 
@@ -12,9 +12,9 @@ use image::{Rgb, RgbImage};
 use rand::prelude::*;
 
 fn main() {
-    let nx = 200;
-    let ny = 100;
-    let ns = 100;
+    let nx = 800;
+    let ny = 400;
+    let ns = 200;
 
     let mat_ground = Lambertian {
         albedo: Vec3::new(0.8, 0.8, 0.0),
@@ -22,14 +22,15 @@ fn main() {
     let mat_center = Lambertian {
         albedo: Vec3::new(0.7, 0.3, 0.3),
     };
-    let mat_left = Metal {
-        albedo: Vec3::new(0.8, 0.8, 0.8),
-        fuzz: 0.3,
-    };
     let mat_right = Metal {
         albedo: Vec3::new(0.8, 0.6, 0.2),
         fuzz: 1.0,
     };
+    let mat_left = Metal {
+        albedo: Vec3::new(0.8, 0.8, 0.8),
+        fuzz: 0.3,
+    };
+    let mat_glass = Dielectric { ref_idx: 1.5 };
 
     let world = HitList {
         hlist: vec![
@@ -52,6 +53,11 @@ fn main() {
                 center: Vec3::new(1., 0., -1.),
                 r: 0.5,
                 material: &mat_right,
+            },
+            Sphere {
+                center: Vec3::new(0.5, -0.2, -0.5),
+                r: 0.3,
+                material: &mat_glass,
             },
         ],
     };
