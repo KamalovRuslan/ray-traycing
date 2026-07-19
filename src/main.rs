@@ -62,7 +62,13 @@ fn main() {
         ],
     };
 
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Vec3::new(-2., 1., 1.), // lookfrom
+        Vec3::new(0., 0., -1.), // lookat
+        Vec3::new(0., 1., 0.),  // vup
+        60.0,                   // vfov
+        nx as f64 / ny as f64,  // aspect
+    );
     let mut image_buffer = RgbImage::new(nx as u32, ny as u32);
     let mut rng = rand::thread_rng();
     for j in (0..ny).rev() {

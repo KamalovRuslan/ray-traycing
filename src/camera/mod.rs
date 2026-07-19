@@ -9,12 +9,19 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self {
+    pub fn new(lookfrom: Vec3, lookat: Vec3, vup: Vec3, vfov: f64, aspect: f64) -> Self {
+        let theta = vfov * std::f64::consts::PI / 180.;
+        let half_height = (theta / 2.).tan();
+        let half_width = aspect * half_height;
+
+        let w = (lookfrom - lookat).normalized();
+        let u = vup.cross(w).normalized();
+        let v = w.cross(u);
         Camera {
-            lower_left_corner: Vec3::new(-2., -1., -1.),
-            horizontal: Vec3::new(4., -0., -0.),
-            vertical: Vec3::new(0., 2., 0.),
-            origin: Vec3::new(0., 0., 0.),
+            lower_left_corner: lookfrom - half_width * u - half_height * v - w,
+            horizontal: 2.0 * half_width * u,
+            vertical: 2.0 * half_height * v,
+            origin: lookfrom,
         }
     }
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
