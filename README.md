@@ -16,13 +16,6 @@ Built as a learning project to explore Rust concepts through graphics programmin
 - Anti-aliasing (multi-sample per pixel)
 - Parallel rendering with rayon
 
-## Build & Run
-
-```bash
-cargo run --release    # renders to output.png (use --release, debug is ~10x slower)
-cargo test             # run unit tests
-```
-
 ## Project Structure
 
 ```
