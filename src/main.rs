@@ -62,26 +62,32 @@ fn main() {
         ],
     };
 
+    let lookfrom = Vec3::new(-2., 1., 1.);
+    let lookat = Vec3::new(0., 0., -1.);
+    let focus_dist = (lookfrom - lookat).length();
+
     let camera = Camera::new(
-        Vec3::new(-2., 1., 1.), // lookfrom
-        Vec3::new(0., 0., -1.), // lookat
-        Vec3::new(0., 1., 0.),  // vup
-        60.0,                   // vfov
-        nx as f64 / ny as f64,  // aspect
+        lookfrom,
+        lookat,
+        Vec3::new(0., 1., 0.), // vup
+        60.0,                  // vfov
+        nx as f64 / ny as f64, // aspect
+        0.3,                   // aperture
+        focus_dist,            // focus_dist
     );
     let mut image_buffer = RgbImage::new(nx as u32, ny as u32);
     let mut rng = rand::thread_rng();
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let mut col = Vec3::new(0., 0., 0.);
-            for _ in 0..ns {
-                let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
-                let v = (j as f64 + rng.gen::<f64>()) / ny as f64;
-                let r = camera.get_ray(u, v);
-                col += color(&r, &world, 0);
-            }
-            col /= ns as f64;
-            col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
+            let col = (0..ns)
+                .map(|_| {
+                    let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
+                    let v = (j as f64 + rng.gen::<f64>()) / ny as f64;
+                    color(&camera.get_ray(u, v), &world, 0)
+                })
+                .fold(Vec3::new(0., 0., 0.), |acc, x| acc + x)
+                / ns as f64;
+            let col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
             let ir = (255.99 * col.r()) as u8;
             let ig = (255.99 * col.g()) as u8;
             let ib = (255.99 * col.b()) as u8;
